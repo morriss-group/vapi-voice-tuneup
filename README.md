@@ -81,5 +81,15 @@ node apply-base.mjs <assistant-id>          # applies base-config.json
 node apply-base.mjs <assistant-id> --dry    # show what would change
 ```
 
+## Other platforms (Retell, Bland, Synthflow)?
+
+The CONCEPTS here are universal — endpointing/latency, voice-setting
+tuning, voicemail detection, keyterm lists, the test-call discipline, the
+tools-server pattern. The SPECIFICS in this kit are VAPI, because that's
+where every fix was earned on a real production line. We won't publish
+configs we haven't run in production — but if you run Retell or Bland
+live, a platform adapter (their equivalent of base-config + apply script)
+would make a great first pull request.
+
 ## License
 MIT

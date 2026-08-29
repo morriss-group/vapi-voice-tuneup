@@ -78,7 +78,10 @@ console.log("\n── Step 3 of 5: phone number ──");
 const nums = await api("/phone-number");
 if (nums.length === 0) {
   console.log(`No phone numbers on this account yet.
-  → Dashboard → Phone Numbers → Buy a number (or import Twilio).
+  → PRO TIP: buy through TWILIO and import — far better local area-code
+    selection than VAPI-native numbers, and a local number answering
+    builds caller trust. (Twilio console → buy → VAPI dashboard →
+    Phone Numbers → Import from Twilio.)
   Then attach your new assistant to it, or re-run this setup.`);
 } else {
   nums.forEach((n, i) => console.log(`  ${i + 1}. ${n.number} (${n.name || "unnamed"})`));

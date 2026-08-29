@@ -11,7 +11,13 @@
 4. Apply this repo's base settings: `node apply-base.mjs <assistant-id>`.
    Add transcriber keyterms: your business name, your city names, brand
    names your callers say.
-5. Phone Numbers → buy/import a number → attach the assistant. Forward
+5. Phone Numbers → buy/import a number → attach the assistant.
+   NUMBER-BUYING TIP (from running this in production): buy the number
+   through TWILIO and import it into VAPI, rather than buying VAPI-native.
+   Twilio's inventory has far better LOCAL area-code selection — and for a
+   local business, a caller seeing their own area code answer is worth
+   real trust. Import: Twilio console → buy number → VAPI dashboard →
+   Phone Numbers → Import from Twilio (needs your Twilio SID + auth token). Forward
    your business line to it, or start with it as an overflow/after-hours
    line (calls roll to the AI only when you don't answer — the gentlest
    rollout).

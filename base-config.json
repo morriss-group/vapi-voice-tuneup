@@ -1,0 +1,29 @@
+{
+  "startSpeakingPlan": {
+    "smartEndpointingPlan": {
+      "provider": "livekit",
+      "waitFunction": "(20 + 500 * sqrt(x) + 2500 * x^3 + 700 + 4000 * max(0, x-0.5)) / 2"
+    }
+  },
+  "maxDurationSeconds": 1800,
+  "voice_11labs_suggested": {
+    "provider": "11labs",
+    "model": "eleven_turbo_v2_5",
+    "stability": 0.4,
+    "style": 0.3,
+    "speed": 1.1,
+    "optimizeStreamingLatency": 3
+  },
+  "transcriber_suggested": {
+    "provider": "deepgram",
+    "model": "nova-3",
+    "numerals": true,
+    "keyterm": ["<your business name>", "<brand names your callers say>"]
+  },
+  "voicemailDetection": {
+    "provider": "twilio",
+    "voicemailDetectionTypes": ["machine_start", "machine_end_beep", "machine_end_silence"],
+    "enabled": true,
+    "machineDetectionTimeout": 25
+  }
+}

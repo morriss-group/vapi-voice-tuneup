@@ -59,7 +59,21 @@ resending tools/toolIds/temperature and you silently strip your agent's
 tools. Always GET the live assistant, mutate, and send the complete model
 object back. `apply-base.mjs` does this correctly.
 
-## Usage
+## Quick start — the wizard
+
+```bash
+VAPI_API_KEY=... node setup.mjs
+```
+
+Walks you from an empty account to a live, fully-tuned receptionist:
+creates the assistant with every fix below pre-applied, attaches your
+phone number, wires call reports, makes you run the systems test, and
+ends by writing **BUILD-BRIEF.md** — a personalized brief you paste into
+an AI coding session (Claude Code, etc.) to build your booking/tools
+layer. The installer's last step is instructions for your agent, because
+that's how software gets built now.
+
+## Manual usage
 
 ```bash
 export VAPI_API_KEY=...

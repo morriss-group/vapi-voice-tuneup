@@ -91,5 +91,10 @@ configs we haven't run in production — but if you run Retell or Bland
 live, a platform adapter (their equivalent of base-config + apply script)
 would make a great first pull request.
 
+Field notes from our own cross-platform work live in `platform-notes/` —
+starting with [Retell setup scars](platform-notes/retell.md) from building
+a real VAPI→Retell failover, including the human-only setup gates every
+autonomous deployment needs to plan around.
+
 ## License
 MIT

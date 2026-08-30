@@ -6,9 +6,20 @@
 import { createInterface } from "node:readline/promises";
 import { writeFileSync, readFileSync } from "node:fs";
 
-const rl = createInterface({ input: process.stdin, output: process.stdout });
+// Interactive when run in a terminal; also accepts piped/scripted input
+// (answers one per line) so the wizard is automatable.
+const tty = process.stdin.isTTY;
+const rl = tty ? createInterface({ input: process.stdin, output: process.stdout }) : null;
+const pipedLines = tty ? null : (await new Promise((res) => {
+  let buf = ""; process.stdin.on("data", (d) => (buf += d));
+  process.stdin.on("end", () => res(buf.split("\n")));
+}));
+let pipedIdx = 0;
 const ask = async (q, def = "") => {
-  const a = (await rl.question(def ? `${q} [${def}] ` : `${q} `)).trim();
+  const promptText = def ? `${q} [${def}] ` : `${q} `;
+  let a;
+  if (tty) a = (await rl.question(promptText)).trim();
+  else { a = (pipedLines[pipedIdx++] ?? "").trim(); console.log(promptText + a); }
   return a || def;
 };
 const KEY = process.env.VAPI_API_KEY;
@@ -142,4 +153,4 @@ console.log(`\n✓ Wrote BUILD-BRIEF.md — paste it into an AI coding session t
   your booking/tools layer. Fill in the [FILL IN] blanks first.
 
 Done. Your receptionist is live and tuned. Test-call it often.`);
-rl.close();
+if (rl) rl.close();

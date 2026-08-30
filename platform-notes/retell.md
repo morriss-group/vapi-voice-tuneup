@@ -20,6 +20,15 @@ Per this kit's rule: nothing here is speculation.
   for VAPI, add a small adapter route that unwraps `name`/`args` into the
   same handlers (ours was ~20 lines). If you can't set custom headers on
   the platform side, support a `?key=` query param for the shared secret.
+- **First-call fixes (from our backup's first live test):** the begin
+  message fires the instant the line connects — before the caller's audio
+  path settles — so the greeting's first words get CLIPPED. Fix:
+  `begin_message_delay_ms: 1000` on the agent, plus a clip-resistant
+  greeting (lead with a throwaway "Hi there!" so a lost first word never
+  costs the business name). And Retell's transcriber needs
+  `boosted_keywords` on the agent (their equivalent of Deepgram keyterms) —
+  without it, our tester's "Hoover" transcribed as "Uber" and "Homewood"
+  as "homework."
 - **Voices:** 300+ in `/list-voices`, spanning ElevenLabs, Cartesia,
   OpenAI, MiniMax and platform voices. Our ear-test winner from the VAPI
   side (Cartesia) is available here too.

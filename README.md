@@ -8,6 +8,13 @@ booking real appointments, calling real suppliers — and tuned these
 settings across dozens of live calls. Every fix here was earned on a
 production phone line, not a demo.
 
+## New here? Not a programmer?
+
+**If you run a service business and someone told you an AI could answer
+your phone — [START HERE](START-HERE.md) instead.** Plain English, no
+jargon, five minutes: what this does, what it honestly costs, and whether
+you should build it yourself or hand it to someone.
+
 ## The problem
 
 A fresh VAPI assistant ships with defaults that produce:

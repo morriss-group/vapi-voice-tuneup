@@ -10,7 +10,9 @@
    how it identifies itself · what it must NEVER discuss.
 4. Apply this repo's base settings: `node apply-base.mjs <assistant-id>`.
    Add transcriber keyterms: your business name, your city names, brand
-   names your callers say.
+   names your callers say. Then snapshot the assistant
+   (`./snapshot-assistant.sh <id>`) and snapshot again after every later
+   change — README fix #5 explains what silently disappears otherwise.
 5. Phone Numbers → buy/import a number → attach the assistant.
    NUMBER-BUYING TIP (from running this in production): buy the number
    through TWILIO and import it into VAPI, rather than buying VAPI-native.

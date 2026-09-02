@@ -61,10 +61,23 @@ Deliberation off the phone, scripts on it.
   "hello?—hey—hello?" dance.
 
 ### 5. The API trap that will bite you
-**PATCH replaces the ENTIRE `model` object.** Send a prompt tweak without
-resending tools/toolIds/temperature and you silently strip your agent's
-tools. Always GET the live assistant, mutate, and send the complete model
-object back. `apply-base.mjs` does this correctly.
+**PATCH replaces the ENTIRE object you send — `model` AND `transcriber`.**
+Send a prompt tweak without resending tools/toolIds/temperature and you
+silently strip your agent's tools. Send a transcriber tweak (switching
+models, tuning endpointing) without resending `keyterm` and you silently
+drop every keyterm — and you won't find out until a caller says a town
+name and the agent hears something else. That exact thing happened on our
+line: one tuning pass on the transcriber wiped 30+ keyterms; city names
+that had worked for weeks stopped landing, and nobody connected it to the
+change for days. Always GET the live assistant, mutate, and send the
+complete object back. `apply-base.mjs` does this correctly.
+
+**Snapshot before AND after every change.**
+`VAPI_API_KEY=... ./snapshot-assistant.sh <assistant-id>` saves the full
+live config and prints the six numbers that go missing silently: prompt
+length, model settings, tool count, keyterm count, transcriber, voice. Run
+it, make your change, run it again, compare the two summaries. A count
+that dropped is a thing you just deleted.
 
 ## Quick start — the wizard
 

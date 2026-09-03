@@ -25,6 +25,7 @@
    rollout).
 
 ## Layer 3 — know what happened on every call (30 min)
+Not a programmer? [MAKE-WEBHOOK-WALKTHROUGH.md](MAKE-WEBHOOK-WALKTHROUGH.md) is this layer done click by click, both tabs, with the fixes for when it doesn't fire.
 1. In Make.com (or Zapier): create a scenario starting with a Webhook
    trigger. Copy the webhook URL.
 2. On the assistant: set `server.url` to that URL and `serverMessages` to

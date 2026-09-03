@@ -18,8 +18,13 @@ you should build it yourself or hand it to someone.
 ## The problem
 
 A fresh VAPI assistant ships with defaults that produce:
-- **4–6 second pauses** before responses (callers say "hello? are you
-  there?")
+- **Multi-second pauses** before responses (callers say "hello? are you
+  there?"). On our own line, measured across 248 real calls after the
+  fixes below, the median wait was still **2.8 s** (p90 4.6 s); see
+  [`latency/RESULTS.md`](latency/RESULTS.md). We could not measure the
+  "before" — the API's history starts after the tune-up — so we don't
+  quote one. The biggest single dial we found afterward is the
+  endpointing tail (fix #6).
 - **Flat, robotic delivery** even on premium voices
 - Calls that get **cut off at 10 minutes** mid-conversation
 - Agents that **never leave voicemail messages** (they greet the machine,
@@ -39,8 +44,15 @@ smartEndpointingPlan (see `base-config.json`).
   monotone. Add `style` 0.3–0.35 for real inflection, `speed` 1.1
   (defaults feel slow on the phone), and `optimizeStreamingLatency: 3`.
 - The flash tier is fastest and flattest; turbo is more human for ~0.5s.
-- In our ear-tests, **Cartesia sonic beat every ElevenLabs config** for
-  human-ness AND speed. Worth an A/B on your own line.
+- **Cartesia sonic is measurably faster** — 0.4–0.6 s to first audio
+  against 0.9–1.4 s for ElevenLabs flash on our line — but in a proper
+  A/B on real calls, four Cartesia voices in a row lost on *sound* (too
+  excited, robotic, and one that turned out to be Australian). The
+  library's accent field is empty for Cartesia voices; pick by the
+  description text and test one sentence before a full call. Our earlier
+  note here that Cartesia "beat every ElevenLabs config for human-ness"
+  did not survive the owner's ear; corrected 2026-09-03. Details in
+  [`TUNING-LOG-2026-09-02.md`](TUNING-LOG-2026-09-02.md).
 
 ### 3. Prompt-side latency: fast paths
 An instruction like "decide what to ask next" makes the model deliberate —
@@ -59,6 +71,14 @@ Deliberation off the phone, scripts on it.
 - Self-contained first message: phone audio garbles the first second;
   a greeting that survives losing its first word prevents the
   "hello?—hey—hello?" dance.
+- **Write read-back pauses as ellipses.** "Pause between chunks" in the
+  prompt does nothing — the voice pauses only where the text has `...`.
+  Put the example in the prompt exactly as it should be spoken:
+  "six oh one... three one oh... oh eight nine two."
+- **Never let the prompt say "read back" aloud.** The voice pronounces it
+  as the past tense ("red back"). Use "let me repeat that."
+- **One filler per tool call.** If the tool has a request-start message,
+  tell the model not to add its own; otherwise callers hear both.
 
 ### 5. The API trap that will bite you
 **PATCH replaces the ENTIRE object you send — `model` AND `transcriber`.**
@@ -78,6 +98,17 @@ live config and prints the six numbers that go missing silently: prompt
 length, model settings, tool count, keyterm count, transcriber, voice. Run
 it, make your change, run it again, compare the two summaries. A count
 that dropped is a thing you just deleted.
+
+### 6. The endpointing tail (found by measuring, not by ear)
+The LiveKit wait function in `base-config.json` tops out near 3.6 s when
+the model thinks the caller will keep talking — and it thinks that after a
+one-word "Yes." Change `4000 * max(0, x-0.5)` to `1500 * max(0, x-0.5)`
+(ceiling 2.2 s, no change for confident turns). Measured on a live line:
+the longest pause-detector wait dropped from 2.9 s to 2.2 s in one call.
+Also set the transcriber's `endpointing` (Deepgram) explicitly — we saw
+one 8-second finalization stall with it unset. The whole night, with the
+numbers and the four voices that lost on sound while winning on speed, is
+in [`TUNING-LOG-2026-09-02.md`](TUNING-LOG-2026-09-02.md).
 
 ## Quick start — the wizard
 

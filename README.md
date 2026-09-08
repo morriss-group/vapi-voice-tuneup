@@ -77,6 +77,23 @@ Deliberation off the phone, scripts on it.
   "six oh one... three one oh... oh eight nine two."
 - **Never let the prompt say "read back" aloud.** The voice pronounces it
   as the past tense ("red back"). Use "let me repeat that."
+- **A rule in the prompt only fires on the path that reads it.** Our read-back
+  rule was correct and live, and the agent still spoke a phone number as a run
+  of digits — because the *self-test script* in the same prompt handed it the
+  number as literal numerals, and it read what it was given. If you write
+  example data anywhere in a prompt, write it the way it should be **spoken**,
+  not the way it is stored.
+- **Callers confirm read-backs they have not checked.** Ours repeated an email
+  back with a letter missing and the customer said "that's correct." The
+  address that got saved had a different typo again, to a domain with no mail
+  server, so the confirmation silently bounced. If an address matters, spell it
+  back letter by letter, and validate the domain before you rely on it.
+- **Say that the call is recorded, in the greeting.** Ours disclosed that it was
+  an AI in the first sentence but never mentioned recording, and a listener in
+  another state asked about it. Recording-consent law differs by state (some
+  need only one party's consent, some need everyone's) and we are not lawyers —
+  check your own, then put it in the first line. It costs two seconds and
+  removes the question permanently.
 - **One filler per tool call.** If the tool has a request-start message,
   tell the model not to add its own; otherwise callers hear both.
 
@@ -109,6 +126,30 @@ Also set the transcriber's `endpointing` (Deepgram) explicitly — we saw
 one 8-second finalization stall with it unset. The whole night, with the
 numbers and the four voices that lost on sound while winning on speed, is
 in [`TUNING-LOG-2026-09-02.md`](TUNING-LOG-2026-09-02.md).
+
+### 7. The interruption plan nobody sets (and the 4-second gap it causes)
+If you never set `stopSpeakingPlan`, you get the default `numWords: 0` — which
+means **any** sound from the caller stops the assistant mid-sentence. Every
+"perfect", "yep", "okay" aborts the reply. And an abort is expensive: it
+restarts the whole cycle — endpointing wait, then the model's ~1 second floor,
+then text-to-speech. On our line that added up to a 3–4 second silence after a
+one-word answer, twice in one call, and the caller said "hello?" because he
+thought it had dropped.
+
+Fix, in `base-config.json`:
+
+```json
+"stopSpeakingPlan": { "numWords": 3, "voiceSeconds": 0.2, "backoffSeconds": 0.6 }
+```
+
+`numWords: 3` means one- and two-word acknowledgements no longer interrupt;
+three words or more still do. State the trade-off to yourself: a two-word
+correction ("no, wrong") now gets talked over. Drop to 2 if you hear that on a
+real call. `backoffSeconds` (default 1.0) is the wait *after* a genuine
+interruption before the assistant resumes.
+
+**Only a real call shows this.** A scripted self-test is a monologue — nobody
+interrupts it — so it will look perfect while callers hear the gap.
 
 ## Quick start — the wizard
 

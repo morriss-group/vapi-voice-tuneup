@@ -26,6 +26,13 @@ Per this kit's rule: nothing here is speculation.
   a single agent is just `weight: 1`. Verify by reading the number back —
   a dashboard-bound number returns the new `inbound_agents` array, which is
   how we caught our own mistake.
+- **Phone-number listing moved too (Retell notice received 2026-09-07).** `GET /list-phone-numbers`
+  is a retired legacy list endpoint (cutoff 06/15/2026, tolerated for a while, now flagged).
+  Use `GET /v2/list-phone-numbers`; the response is a paginated object (`items`, `pagination_key`,
+  `has_more`) instead of a bare array. Nothing in the failover path calls it — the one flagged
+  call (2026-08-31) was a hand check from a session verifying the number→agent binding. Same
+  pattern as the agent-list retirement above: the legacy list endpoints all moved to `/v2/`.
+
 - **Agent listing moved too.** `GET /list-agents` and `GET /list-chat-agents`
   were retired 07/31/2026 in favor of `POST /v2/list-agents`: POST not GET,
   filter with `filter_criteria.channel` (voice or chat), read results from

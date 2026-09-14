@@ -27,9 +27,18 @@ const api = (path, opts = {}) =>
 
 const live = await api(`/assistant/${id}`);
 console.log(`assistant: ${live.name} (${id})`);
+console.warn(`\nTHIS SCRIPT DOES NOT SNAPSHOT. Snapshot first, every time:
+  VAPI_API_KEY=... ./snapshot-assistant.sh ${id}
+It REPLACES stopSpeakingPlan and voicemailDetection wholesale. It MERGES
+startSpeakingPlan onto whatever is live, so keys you set yourself survive.\n`);
 
 const patch = {
-  startSpeakingPlan: base.startSpeakingPlan,
+  // Merge, don't replace: a waitSeconds you tuned by hand stays.
+  startSpeakingPlan: { ...(live.startSpeakingPlan || {}), ...base.startSpeakingPlan },
+  // The one the README calls fix #7 and every earlier version of this script
+  // forgot to send. Unset means numWords: 0, which is the 3-4 second "hello?"
+  // gap — a "yep" aborts the whole reply.
+  stopSpeakingPlan: base.stopSpeakingPlan,
   maxDurationSeconds: base.maxDurationSeconds,
   voicemailDetection: base.voicemailDetection,
 };

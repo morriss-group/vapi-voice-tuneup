@@ -94,13 +94,11 @@ latency-relevant changes:
 The first retrievable call is 2026-08-20 00:37 UTC, i.e. after v32. The
 assistant itself was created 2026-06-13, but VAPI's version history starts
 at v1 on 2026-08-09, so there is no API record of what ran between June and
-August 9. Corroborating repo evidence: `~/themrfixedit-agent`
-`voice-stack-review-GROK-BRIEF.md` (committed 2026-08-19) quotes the pre-v32
-voice settings (stability 0.7, optimizeStreamingLatency 4) alongside the
-same smartEndpointingPlan; `~/hcp-booking-agent` CLAUDE.md (2026-08-28)
-records the endpointing plan as the "single biggest latency fix" learned on
-a *different* assistant's test calls, copied from the production line. Neither is a
-measurement of the production line before the fix.
+August 9. Corroborating notes kept outside this repository quote the pre-v32
+voice settings (stability 0.7, optimizeStreamingLatency 4) alongside the same
+smartEndpointingPlan, and record the endpointing plan as the single biggest
+latency fix learned on a *different* assistant. Neither is a measurement of
+this line before the fix.
 
 **Verdict: no defensible before/after boundary exists in retained data.**
 Weekly buckets are reported instead and show no step change — as expected,

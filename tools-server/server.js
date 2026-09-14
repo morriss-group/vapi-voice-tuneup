@@ -4,7 +4,7 @@
 import express from "express";
 import crypto from "node:crypto";
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "256kb" }));
 
 // ---------------------------------------------------------------------------
 // THE SECRET. Read this before you deploy.
@@ -32,15 +32,28 @@ app.use(express.json());
 // ---------------------------------------------------------------------------
 const SHARED_SECRET = (process.env.SHARED_SECRET || "").trim();
 
+const MAX_SECRET_CHARS = 256;
+
+// VAPI's dashboard default today is an `Authorization: Bearer <secret>`
+// credential. Older setups and the walkthrough in DEPLOY-GUIDE use a custom
+// header. Accept all three so a reader who follows either instruction works —
+// they all still have to know the secret.
+function readSuppliedSecret(req) {
+  const rawAuth = String(req.get("authorization") || "");
+  const bearer = rawAuth.toLowerCase().startsWith("bearer ") ? rawAuth.slice(7) : "";
+  return String(req.get("x-vapi-secret") || req.get("x-shared-secret") || bearer || "");
+}
+
 function secretOk(req) {
   // Rule 1: nothing configured means nothing gets in.
   if (!SHARED_SECRET) return false;
-  // VAPI sends whichever header you configured on the tool. Accept both names.
-  const supplied = String(req.get("x-vapi-secret") || req.get("x-shared-secret") || "");
-  const a = Buffer.from(supplied);
-  const b = Buffer.from(SHARED_SECRET);
-  // Rule 2: equal lengths first, because timingSafeEqual throws on a mismatch.
-  if (a.length !== b.length) return false;
+  const supplied = readSuppliedSecret(req);
+  if (!supplied || supplied.length > MAX_SECRET_CHARS) return false;
+  // Rule 2: hash both sides first. Comparing the raw strings needs a length
+  // check before timingSafeEqual (it throws on a mismatch), and that early
+  // return leaks the secret's length. Digests are always 32 bytes.
+  const a = crypto.createHash("sha256").update(supplied).digest();
+  const b = crypto.createHash("sha256").update(SHARED_SECRET).digest();
   return crypto.timingSafeEqual(a, b);
 }
 
@@ -55,9 +68,7 @@ function requireSecret(req, res, next) {
 // Health check (Railway + your own monitoring). Deliberately NOT behind the
 // secret: your host has to be able to reach it to know the app is alive. It
 // returns nothing but ok:true, so there is nothing here to protect.
-app.get("/status", (_req, res) =>
-  res.json({ ok: true, secretConfigured: Boolean(SHARED_SECRET) })
-);
+app.get("/status", (_req, res) => res.json({ ok: true }));
 
 // Example tool endpoint. In VAPI, create a tool whose server URL is
 // https://<your-app>.up.railway.app/vapi and route on the tool name.
@@ -68,7 +79,9 @@ app.post("/vapi", requireSecret, async (req, res) => {
   let result;
   switch (name) {
     case "check_availability":
-      // Replace with a real lookup against your calendar/FSM API.
+      // STUB. These are not real openings. Do not attach this tool to an
+      // assistant that answers a live number until it reads a real calendar —
+      // the agent will read these windows out loud as if they were bookable.
       result = { available: true, next_slots: ["Tue 10-12", "Wed 2-4"] };
       break;
     default:

@@ -14,8 +14,12 @@
 set -e
 ID="${1:?usage: snapshot-assistant.sh <assistant-id>}"
 : "${VAPI_API_KEY:?set VAPI_API_KEY in the environment}"
-mkdir -p config-snapshots
-OUT="config-snapshots/${ID:0:8}-$(date +%Y%m%d-%H%M%S).json"
+# Write next to THIS script, not the current directory. .gitignore only
+# covers config-snapshots/ under the repo root — run from $HOME and the
+# snapshot lands somewhere nothing is protecting it.
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+mkdir -p "$ROOT/config-snapshots"
+OUT="$ROOT/config-snapshots/${ID:0:8}-$(date +%Y%m%d-%H%M%S).json"
 curl -sf -H "Authorization: Bearer $VAPI_API_KEY" "https://api.vapi.ai/assistant/$ID" \
   | python3 -m json.tool > "$OUT"
 python3 - "$OUT" << 'PY'
@@ -32,3 +36,7 @@ print("  transcriber  :", t.get('provider'), t.get('model'))
 print("  voice        :", (d.get('voice') or {}).get('provider'), (d.get('voice') or {}).get('voiceId'))
 PY
 # Compare two snapshots later with:  diff <(python3 -m json.tool A.json) <(python3 -m json.tool B.json)
+echo
+echo "This file is the FULL live assistant: your prompt, your tools, and any"
+echo "tool header values VAPI returns. Treat it like a credential. It is"
+echo "gitignored only as config-snapshots/ under this repo."

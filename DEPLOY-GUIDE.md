@@ -7,12 +7,23 @@
 3. Write the system prompt. Non-negotiables that survive contact with real
    callers: 1-3 short sentences per turn · ONE question at a time · never
    invent prices or promises ("Marc will confirm that") · exact wording for
-   how it identifies itself · what it must NEVER discuss.
-4. Apply this repo's base settings: `node apply-base.mjs <assistant-id>`.
+   how it identifies itself · what it must NEVER discuss · **exact wording
+   for when the caller asks for a person** — take a name and number and end
+   the call, do not keep them on the line hoping the agent can handle it ·
+   **"this call is recorded" in the first sentence of the greeting.**
+   Alabama and federal law are both one-party consent; several states are
+   all-party, and an interstate call can pull in the stricter one. If you
+   record and you are not in a one-party state, ask a lawyer in yours. The
+   greeting line costs you nothing either way.
+4. **Snapshot first:** `./snapshot-assistant.sh <id>`. Then apply this repo's
+   base settings: `node apply-base.mjs <assistant-id>` (add `--dry` first if
+   the assistant already has settings you tuned by hand). Snapshot again after
+   every later change — README fix #5 explains what silently disappears
+   otherwise. `apply-base.mjs` does not touch `model`, so your prompt and
+   tools survive it. It does replace `stopSpeakingPlan` and `voicemailDetection`
+   whole, and merges `startSpeakingPlan` onto what is live.
    Add transcriber keyterms: your business name, your city names, brand
-   names your callers say. Then snapshot the assistant
-   (`./snapshot-assistant.sh <id>`) and snapshot again after every later
-   change — README fix #5 explains what silently disappears otherwise.
+   names your callers say.
 5. Phone Numbers → buy/import a number → attach the assistant.
    NUMBER-BUYING TIP (from running this in production): buy the number
    through TWILIO and import it into VAPI, rather than buying VAPI-native.
@@ -64,9 +75,13 @@ nothing is at stake — which is exactly why it is easy to skip and easy to forg
 2. In your host's dashboard (Railway: your service → Variables), add
    `SHARED_SECRET` and paste it. Redeploy.
 
-3. In VAPI, on **each** tool you created, add a request header. Name it
-   `x-vapi-secret`, value the same string. Every tool, not just the first one —
-   a single unprotected tool is an unprotected server.
+3. In VAPI, on **each** tool you created, add the credential. Every tool, not
+   just the first one — a single unprotected tool is an unprotected server.
+   VAPI's current dashboard default is an `Authorization: Bearer <secret>`
+   credential; older setups use a custom header named `x-vapi-secret`. This
+   server accepts either, plus `x-shared-secret`. Pick one and use the same
+   one on every tool. (If a custom header named `x-vapi-secret` stops
+   arriving, VAPI is using that name itself — switch to `x-shared-secret`.)
 
 4. Verify it actually works, because an untested gate is not a gate:
 
@@ -74,9 +89,16 @@ nothing is at stake — which is exactly why it is easy to skip and easy to forg
    curl -s -o /dev/null -w "%{http_code}\n" -X POST https://<your-app>.up.railway.app/vapi
    ```
 
-   That must print **401**. If it prints 200, the secret is not set and your
-   endpoint is open to the world. Then call your own agent and confirm a real
-   tool call still succeeds.
+   That must print **401**. If it prints 200 you are running a build without
+   the gate. `/status` answers `{"ok":true}` either way — it is a health check
+   and deliberately tells you nothing about your config. To confirm the secret
+   is actually set, check your host's Variables tab. Then call your own agent
+   and confirm a real tool call still succeeds.
+
+5. Do not attach the example `check_availability` tool to an assistant that
+   answers a live number. It returns invented windows ("Tue 10-12"), and the
+   agent will read them to a caller as if they were on your calendar. Layer 5
+   replaces it with a real lookup first.
 
 5. `GET /status` reports `secretConfigured: true/false` so you can check a deploy
    picked the variable up without ever printing the value.

@@ -1,3 +1,9 @@
 BUILD-BRIEF.md
 node_modules/
 config-snapshots/
+.env
+.env.*
+*.env
+calls.json
+**/calls.json
+.DS_Store

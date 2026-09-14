@@ -6,6 +6,8 @@
 import { createInterface } from "node:readline/promises";
 import { writeFileSync, readFileSync } from "node:fs";
 
+const base = JSON.parse(readFileSync(new URL("./base-config.json", import.meta.url)));
+
 // Interactive when run in a terminal; also accepts piped/scripted input
 // (answers one per line) so the wizard is automatable.
 const tty = process.stdin.isTTY;
@@ -64,18 +66,19 @@ console.log("\n── Step 2 of 5: creating your assistant (with all tuning pre-
 const prompt = `You are the friendly AI receptionist for ${biz}, a ${trade} business serving ${area}.
 HOW YOU TALK: 1-3 short sentences per turn. ONE question at a time — wait for the answer. Warm, natural, never robotic. If asked whether you are a real person, say plainly that you are ${biz}'s AI receptionist.
 YOUR JOB: greet the caller, learn why they're calling, and ${goal === "2" ? "collect what's needed to book them: name, phone number (read it back grouped to confirm), address, and what needs service. Say someone will confirm the exact time." : "take a complete message: name, phone number (read it back grouped to confirm), and what they need. Promise a callback."}
-HARD RULES: never invent prices, availability, or promises — say "they'll confirm that with you directly." Never give out personal information. If the caller is angry or it's an emergency, be kind and promise a fast callback. Keep the whole call efficient and pleasant.`;
+HARD RULES: never invent prices, availability, or promises — say "they'll confirm that with you directly." Never give out personal information. If the caller asks for a person, stop collecting booking details, take a name and number, and say someone will call them back — do not keep them on the line hoping you can handle it. If the caller is angry or it's an emergency, be kind and promise a fast callback. Keep the whole call efficient and pleasant.`;
 const created = await api("/assistant", {
   method: "POST",
   body: JSON.stringify({
     name: `${biz} receptionist`,
-    firstMessage: `Thanks for calling ${biz}! I'm the AI receptionist — how can I help you today?`,
+    firstMessage: `Thanks for calling ${biz}. This call is recorded. I'm the AI receptionist — how can I help you today?`,
     model: { provider: "anthropic", model: "claude-sonnet-4-6", temperature: 0.25, maxTokens: 800,
       messages: [{ role: "system", content: prompt }] },
     voice: { provider: "11labs", voiceId: "21m00Tcm4TlvDq8ikWAM", model: "eleven_turbo_v2_5",
       stability: 0.4, style: 0.3, speed: 1.1, optimizeStreamingLatency: 3 },
     transcriber: { provider: "deepgram", model: "nova-3", numerals: true, keyterm: keyterms },
-    startSpeakingPlan: JSON.parse(readFileSync(new URL("./base-config.json", import.meta.url))).startSpeakingPlan,
+    startSpeakingPlan: base.startSpeakingPlan,
+    stopSpeakingPlan: base.stopSpeakingPlan,
     maxDurationSeconds: 1800,
     voicemailDetection: { provider: "twilio", enabled: true, machineDetectionTimeout: 25,
       voicemailDetectionTypes: ["machine_start", "machine_end_beep", "machine_end_silence"] },
@@ -95,6 +98,7 @@ if (nums.length === 0) {
     Phone Numbers → Import from Twilio.)
   Then attach your new assistant to it, or re-run this setup.`);
 } else {
+  console.log("  Do not point your real business line at a brand-new agent. Overflow-first, or a second number.\n");
   nums.forEach((n, i) => console.log(`  ${i + 1}. ${n.number} (${n.name || "unnamed"})`));
   const pick = await ask(`Attach the assistant to which number? (1-${nums.length}, or 'skip')`, "skip");
   if (pick !== "skip" && nums[+pick - 1]) {

@@ -3,7 +3,11 @@
 # Usage: VAPI_API_KEY=... ASSISTANT_ID=... ./score-last-calls.sh [N]   (default 2)
 : "${VAPI_API_KEY:?set VAPI_API_KEY}"
 N="${1:-2}"
-OUT=/tmp/last-calls.json
+# The raw payload has transcripts, caller numbers and recording links in it.
+# Private per-run path, deleted on exit — not a world-readable /tmp/last-calls.json
+# that sits there until someone reboots.
+OUT="${TMPDIR:-/tmp}/vapi-score-$$.json"
+trap 'rm -f "$OUT"' EXIT
 curl -s -m 40 -H "Authorization: Bearer $VAPI_API_KEY" "https://api.vapi.ai/call?assistantId=${ASSISTANT_ID:?set ASSISTANT_ID}&limit=$N" -o "$OUT"
 python3 - "$OUT" <<'PY'
 import json,sys,statistics as st

@@ -139,14 +139,24 @@ thought it had dropped.
 Fix, in `base-config.json`:
 
 ```json
-"stopSpeakingPlan": { "numWords": 3, "voiceSeconds": 0.2, "backoffSeconds": 0.6 }
+"stopSpeakingPlan": { "numWords": 2, "voiceSeconds": 0.2, "backoffSeconds": 0.6 }
 ```
 
-`numWords: 3` means one- and two-word acknowledgements no longer interrupt;
-three words or more still do. State the trade-off to yourself: a two-word
-correction ("no, wrong") now gets talked over. Drop to 2 if you hear that on a
-real call. `backoffSeconds` (default 1.0) is the wait *after* a genuine
-interruption before the assistant resumes.
+`numWords: 2` means one-word acknowledgements no longer interrupt — "yep",
+"okay", "perfect" — while two words still stop the assistant. The trade-off runs
+both directions and it is worth saying out loud. At 2, "uh huh" and "go ahead"
+still cut it off. At 3 they stop doing that, but so do "no, wrong" and "wrong
+address" — a caller trying to correct your agent has to say it again, longer,
+before anything listens to him. `backoffSeconds` (default 1.0) is the wait
+*after* a genuine interruption before the assistant resumes.
+
+**This file published `3` while the line it was drawn from ran `2`.** An earlier
+version of this section told you to drop to 2 if you heard a correction get
+talked over; that is exactly what happened on a real call, the live assistant was
+changed, and this file was not. So the number strangers installed was the one
+number nobody had tested. It is 2 here now because 2 is the one that has
+answered calls and booked jobs. Your callers may differ — trust your own
+recordings over this file, which is the point of the whole repo.
 
 **Only a real call shows this.** A scripted self-test is a monologue — nobody
 interrupts it — so it will look perfect while callers hear the gap.

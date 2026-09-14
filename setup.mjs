@@ -71,7 +71,12 @@ const created = await api("/assistant", {
   method: "POST",
   body: JSON.stringify({
     name: `${biz} receptionist`,
-    firstMessage: `Thanks for calling ${biz}. This call is recorded. I'm the AI receptionist — how can I help you today?`,
+    // The leading "Hi —" is throwaway on purpose: carriers eat the first word of
+    // an answered call, and what survives the clipping is the greeting you wanted.
+    // README #8 documents the stronger fix (an SSML <break>), which is NOT the
+    // default here — if your voice provider does not honour SSML, the assistant
+    // reads the tag out loud to a customer. Test that one on a spare number.
+    firstMessage: `Hi — thanks for calling ${biz}. This call is recorded. I'm the AI receptionist — how can I help you today?`,
     model: { provider: "anthropic", model: "claude-sonnet-4-6", temperature: 0.25, maxTokens: 800,
       messages: [{ role: "system", content: prompt }] },
     voice: { provider: "11labs", voiceId: "21m00Tcm4TlvDq8ikWAM", model: "eleven_turbo_v2_5",

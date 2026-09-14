@@ -161,6 +161,37 @@ recordings over this file, which is the point of the whole repo.
 **Only a real call shows this.** A scripted self-test is a monologue — nobody
 interrupts it — so it will look perfect while callers hear the gap.
 
+### 8. The first word of your greeting is getting eaten (and there is no setting for it)
+Call your own agent and listen to the very first syllable. On our line the
+greeting started mid-word — "…anks for calling" — because the audio path is not
+fully up at the instant VAPI starts speaking. The caller's first impression is a
+broken word.
+
+There is no VAPI field for this. `startSpeakingPlan.waitSeconds` only applies
+*after* the caller stops talking, and a real one-second silence when someone
+answers sounds like a dead line, which is the same complaint from the other end.
+
+**The pause has to live in the greeting text.** VAPI passes SSML through to
+ElevenLabs, and `<break>` is honoured on `eleven_flash_v2_5`:
+
+```json
+"firstMessage": "<break time=\"1.0s\" /> Thanks for calling Acme Appliance. ..."
+```
+
+One second is enough. ElevenLabs caps `<break>` at 3 seconds, and **Eleven v3
+dropped SSML support entirely** — so this silently stops working the day you move
+the voice model forward, and it stops working by reading the tag aloud.
+
+**Test it on a number that is not your business line first.** If the tag is not
+honoured, the failure mode is your assistant saying "break time one second" to a
+customer. We tested on the rehearsal line, heard clean silence, and only then put
+it on the line that answers real calls. Cartesia voices are a different provider
+with different markup — do not assume this transfers.
+
+The cheap alternative if your provider will not take SSML: make the first word
+disposable. "Hi — thanks for calling Acme" survives being clipped, because what
+is left is the greeting you wanted.
+
 ## Quick start — the wizard
 
 ```bash

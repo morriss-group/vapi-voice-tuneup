@@ -48,6 +48,45 @@ Deploy `tools-server/` from this repo to Railway (or any Node host):
    WHOLE model object — always GET, mutate, resend complete (tools
    included), or you'll silently strip them.
 
+## Layer 4.5 — lock the tools server BEFORE you connect it to anything real
+
+**Do this in the same sitting as Layer 4. Not "later."** The moment Layer 5 wires
+that endpoint to your actual calendar, an unprotected URL is a stranger reading
+your schedule and booking on it. Until then it returns a hard-coded example and
+nothing is at stake — which is exactly why it is easy to skip and easy to forget.
+
+1. Generate a secret. Any long random string; this makes one:
+
+   ```
+   openssl rand -hex 32
+   ```
+
+2. In your host's dashboard (Railway: your service → Variables), add
+   `SHARED_SECRET` and paste it. Redeploy.
+
+3. In VAPI, on **each** tool you created, add a request header. Name it
+   `x-vapi-secret`, value the same string. Every tool, not just the first one —
+   a single unprotected tool is an unprotected server.
+
+4. Verify it actually works, because an untested gate is not a gate:
+
+   ```
+   curl -s -o /dev/null -w "%{http_code}\n" -X POST https://<your-app>.up.railway.app/vapi
+   ```
+
+   That must print **401**. If it prints 200, the secret is not set and your
+   endpoint is open to the world. Then call your own agent and confirm a real
+   tool call still succeeds.
+
+5. `GET /status` reports `secretConfigured: true/false` so you can check a deploy
+   picked the variable up without ever printing the value.
+
+**The trap this avoids, and it is the one that catches people:** the obvious way
+to write that check treats "no secret configured" as "nothing to check" and lets
+everything through. So the day a deploy drops the variable, the endpoint silently
+opens instead of failing loudly. The server in this repo refuses every request
+when `SHARED_SECRET` is missing. Keep it that way.
+
 ## Layer 5 — your business systems
 Your tools server is the only thing that talks to them. Keep credentials
 in env vars on the server — the AI never sees them; it just calls your

@@ -8,7 +8,13 @@ N="${1:-2}"
 # that sits there until someone reboots.
 OUT="${TMPDIR:-/tmp}/vapi-score-$$.json"
 trap 'rm -f "$OUT"' EXIT
-curl -s -m 40 -H "Authorization: Bearer $VAPI_API_KEY" "https://api.vapi.ai/call?assistantId=${ASSISTANT_ID:?set ASSISTANT_ID}&limit=$N" -o "$OUT"
+# --config - takes the key on stdin. `-H "Authorization: ..."` would put it on
+# the command line, where ps can read it for the life of the request.
+: "${ASSISTANT_ID:?set ASSISTANT_ID}"
+curl -s -m 40 --config - -o "$OUT" <<CFG
+header = "Authorization: Bearer ${VAPI_API_KEY}"
+url = "https://api.vapi.ai/call?assistantId=${ASSISTANT_ID}&limit=${N}"
+CFG
 python3 - "$OUT" <<'PY'
 import json,sys,statistics as st
 calls=json.load(open(sys.argv[1]))

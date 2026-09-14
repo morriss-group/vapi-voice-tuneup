@@ -50,7 +50,10 @@ def _get(url, key):
     except urllib.error.HTTPError as e:
         if e.code != 403:
             raise
-    out = subprocess.run(["curl", "-s", "-H", "Authorization: Bearer " + key, url],
+    # The key goes to curl on STDIN, not on the command line. An -H argument is
+    # visible to anyone who can run `ps` for as long as the request takes.
+    cfg = 'header = "Authorization: Bearer {}"\nurl = "{}"\n'.format(key, url)
+    out = subprocess.run(["curl", "-s", "--config", "-"], input=cfg,
                          capture_output=True, text=True, check=True)
     return json.loads(out.stdout)
 

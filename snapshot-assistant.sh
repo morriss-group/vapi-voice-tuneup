@@ -20,8 +20,11 @@ ID="${1:?usage: snapshot-assistant.sh <assistant-id>}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$ROOT/config-snapshots"
 OUT="$ROOT/config-snapshots/${ID:0:8}-$(date +%Y%m%d-%H%M%S).json"
-curl -sf -H "Authorization: Bearer $VAPI_API_KEY" "https://api.vapi.ai/assistant/$ID" \
-  | python3 -m json.tool > "$OUT"
+# Key on stdin via --config, never as an -H argument that ps can see.
+curl -sf --config - <<CFG | python3 -m json.tool > "$OUT"
+header = "Authorization: Bearer ${VAPI_API_KEY}"
+url = "https://api.vapi.ai/assistant/${ID}"
+CFG
 python3 - "$OUT" << 'PY'
 import json, sys
 d = json.load(open(sys.argv[1]))

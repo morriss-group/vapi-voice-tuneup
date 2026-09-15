@@ -25,11 +25,17 @@
    Add transcriber keyterms: your business name, your city names, brand
    names your callers say.
 5. Phone Numbers → buy/import a number → attach the assistant.
-   NUMBER-BUYING TIP (from running this in production): buy the number
-   through TWILIO and import it into VAPI, rather than buying VAPI-native.
-   Twilio's inventory has far better LOCAL area-code selection — and for a
-   local business, a caller seeing their own area code answer is worth
-   real trust. Import: Twilio console → buy number → VAPI dashboard →
+   ⚠️ **BUY THE NUMBER THROUGH TWILIO AND IMPORT IT. Do not use a
+   Vapi-provided number if your agent will ever hand a caller to a person.**
+   Two reasons, and the second one is not optional:
+   1. Twilio's inventory has far better LOCAL area-code selection, and for a
+      local business a caller seeing their own area code answer is worth real
+      trust.
+   2. **A Vapi-provided number cannot transfer a call.** We tested the same
+      assistant, same transfer plan, same destination, on both: the Vapi
+      number failed every time with `call.in-progress.error-transfer-failed`
+      and the Twilio number connected on the first try. The error says nothing
+      about why. See README fix #9. Import: Twilio console → buy number → VAPI dashboard →
    Phone Numbers → Import from Twilio (needs your Twilio SID + auth token). Forward
    your business line to it, or start with it as an overflow/after-hours
    line (calls roll to the AI only when you don't answer — the gentlest

@@ -42,8 +42,11 @@ Nobody writes this part down, so here it is. There are three meters
 running, and all of them bill by the minute or the month:
 
 1. **The voice platform** (VAPI or similar) — charged per minute of call
-2. **The phone number and carrier** (usually Twilio) — a small monthly fee
-   for the number, plus per-minute
+2. **The phone number and carrier** (get it from Twilio and import it) — a
+   small monthly fee for the number, plus per-minute. **Not a Vapi-provided
+   number if your agent will ever transfer a caller to a person: those cannot
+   do it, and the failure is silent to the caller and cryptic to you. README
+   fix #9 has the test that showed it.**
 3. **The voice itself** (ElevenLabs, Cartesia) — often bundled, sometimes
    separate
 
@@ -76,7 +79,9 @@ Don't solve a problem you don't have.
 ## What you'd need before starting
 
 - A VAPI account (or similar voice platform)
-- A phone number you're willing to route (start with a NEW number and test
+- A phone number you're willing to route — **buy it through Twilio and import
+  it, not a Vapi-provided one; Vapi numbers cannot transfer a call to a person**
+  (start with a NEW number and test
   it for weeks before touching your real business line — see below)
 - Your business rules written down: hours, service area, brands you decline,
   what you charge for a diagnostic

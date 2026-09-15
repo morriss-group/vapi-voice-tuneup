@@ -192,6 +192,46 @@ The cheap alternative if your provider will not take SSML: make the first word
 disposable. "Hi — thanks for calling Acme" survives being clipped, because what
 is left is the greeting you wanted.
 
+### 9. Your transfers will not work on a Vapi-provided number
+If you take one thing from this file, take this one, because the error message
+tells you nothing and you will lose an evening to it.
+
+A call transfer that works perfectly on one number fails on another with:
+
+```
+endedReason: call.in-progress.error-transfer-failed
+```
+
+Same assistant. Same `transferPlan`. Same destination. Same message. The only
+difference was where the phone number came from:
+
+| Number source | `sipVerb` | Result |
+|---|---|---|
+| Vapi-provided | `refer` | **error-transfer-failed** |
+| Vapi-provided | `dial` | **error-transfer-failed** |
+| Twilio, imported | `refer` | connects |
+
+We moved the SAME assistant onto an imported Twilio number and the transfer
+connected on the first try. Nothing else changed.
+
+**`sipVerb` is undocumented and behaves badly in two ways.** It is not in the
+docs at all. Its legal values only surfaced by sending a deliberately invalid one
+and reading the 400:
+
+```
+sipVerb must be one of the following values: refer, bye, dial
+```
+
+And **omitting it does not clear it.** A PATCH sending a `transferPlan` with no
+`sipVerb` came back from the API still saying `"refer"` — it merges or defaults.
+If you want it changed you must send the new value explicitly, and then READ IT
+BACK, because a deploy script that prints a tidy summary without that field will
+tell you the change landed when it did not. Ours did exactly that.
+
+**What to do:** buy your number through Twilio and import it. START-HERE already
+tells you that for local area-code selection. It also decides whether your agent
+can hand a caller to a human at all.
+
 ## Quick start — the wizard
 
 ```bash

@@ -1,8 +1,9 @@
 {
   "startSpeakingPlan": {
+    "waitSeconds": 0.2,
     "smartEndpointingPlan": {
       "provider": "livekit",
-      "waitFunction": "(20 + 500 * sqrt(x) + 2500 * x^3 + 700 + 1500 * max(0, x-0.5)) / 2"
+      "waitFunction": "(20 + 500 * sqrt(x) + 2500 * x^3 + 300 + 1500 * max(0, x-0.5)) / 2"
     }
   },
   "stopSpeakingPlan": {
@@ -17,7 +18,11 @@
     "stability": 0.4,
     "style": 0.3,
     "speed": 1.1,
-    "optimizeStreamingLatency": 3
+    "optimizeStreamingLatency": 3,
+    "chunkPlan": {
+      "enabled": true,
+      "minCharacters": 15
+    }
   },
   "transcriber_suggested": {
     "provider": "deepgram",
@@ -26,7 +31,19 @@
     "keyterm": [
       "<your business name>",
       "<brand names your callers say>"
-    ]
+    ],
+    "fallbackPlan": {
+      "autoFallback": {
+        "enabled": true
+      },
+      "transcribers": [
+        {
+          "provider": "assembly-ai",
+          "speechModel": "universal-streaming-english",
+          "language": "en"
+        }
+      ]
+    }
   },
   "voicemailDetection": {
     "provider": "twilio",

@@ -54,6 +54,30 @@ Other numbers from the same data:
 - Per assistant version (v38 → v45, prompt/keyterm/tool edits only) the
   median gap ranges 2.6–3.0 s. No version shows a step change.
 
+
+## Re-measure, 2026-09-22 (355 turns, 2026-09-15 → 09-22, before the 9/22 settings change)
+
+Same method, VAPI `artifact.performanceMetrics.turnLatencies`. Numbers only.
+
+| | ordinary replies | lookup turns |
+|---:|---:|---:|
+| turns | 250 | 105 |
+| median | 3.0 s | 4.0 s |
+| p75 | 3.6 s | 5.4 s |
+| p90 | 5.0 s | 7.1 s |
+| turns over 4 s | 17% | 50% |
+
+Per piece, all turns, median / p90: endpointing 0.51 / 0.99 s · transcriber 0.38 / 1.08 s · model 1.10 / 2.09 s ·
+voice 0.57 / 1.14 s · unattributed 0.03 / 1.70 s. On turns between 4.0 and 6.5 s the unattributed share has a
+median of 1.27 s, which is the second model pass on lookup turns.
+
+Worst tail this window: 15.3 s (a 9.6 s transcriber finalization) and 11.9 s (model). Provider status pages showed
+no incidents on those days.
+
+**2026-09-22 07:00 CT change, applied and NOT yet measured:** waitFunction constant 700 → 300 ms;
+`startSpeakingPlan.waitSeconds` 0.2; `voice.chunkPlan.minCharacters` 15. The next section of this file will carry
+the numbers from the first full day on those settings. Until it does, the numbers above are the current truth.
+
 ## Method
 
 Source: `GET https://api.vapi.ai/call?assistantId=…&limit=100`, paged

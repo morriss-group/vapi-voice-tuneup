@@ -8,6 +8,8 @@ booking real appointments, calling real suppliers — and tuned these
 settings across dozens of live calls. Every fix here was earned on a
 production phone line, not a demo.
 
+**Update, September 22, 2026:** a second tuning log, [three weeks later](TUNING-LOG-2026-09-22.md): the pauses measured by piece, three prompt rules tested in text before going live, a booking lost to a space in an email and fixed in code, and [VAPI field notes](platform-notes/vapi.md).
+
 ## New here? Not a programmer?
 
 **If you run a service business and someone told you an AI could answer

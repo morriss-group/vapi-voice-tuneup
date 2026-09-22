@@ -10,6 +10,8 @@ production phone line, not a demo.
 
 **Update, September 22, 2026:** a second tuning log, [three weeks later](TUNING-LOG-2026-09-22.md): the pauses measured by piece, three prompt rules tested in text before going live, a booking lost to a space in an email and fixed in code, and [VAPI field notes](platform-notes/vapi.md).
 
+**Built yours already?** [CHANGELOG.md](CHANGELOG.md) lists every change since, with the exact line to edit in your own prompt. GitHub will not tell you on its own: on this page, **Watch → Custom → Releases** and you get an email each time.
+
 ## New here? Not a programmer?
 
 **If you run a service business and someone told you an AI could answer

@@ -60,6 +60,10 @@ Per this kit's rule: nothing here is speculation.
   OpenAI, MiniMax and platform voices. Our ear-test winner from the VAPI
   side (Cartesia) is available here too.
 
+
+### The prompt cannot hang up without an `end_call` tool
+Our backup prompt said "end the call right then, silently" for robocalls, and had for three weeks. The LLM's `general_tools` held only our six custom tools; there was no `end_call` entry, so the instruction could not execute. Add `{"type": "end_call", "name": "end_call", "description": "..."}` to `general_tools` on the LLM. Check with `GET /get-retell-llm/{id}`. Found 2026-09-22 while porting a goodbye rule.
+
 ## The human gates (no API will do these — plan ONE sitting for all of them)
 Autonomous setup hits four walls that are human-only by design. The
 workaround isn't automation — it's batching: do them in one sitting, in

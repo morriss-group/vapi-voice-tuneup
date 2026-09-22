@@ -46,3 +46,11 @@ Per the speech-configuration docs, in the LiveKit smart endpointing plan `x` is 
 ## Two settings with default values you never see
 
 `startSpeakingPlan.waitSeconds` defaults to 0.4 s and `voice.chunkPlan.minCharacters` defaults to 30; neither appears in a GET until you set them. Both are on every turn.
+
+## A hyphen next to a digit is spoken as "minus"
+
+ElevenLabs reads `E-4-2` as "E minus four minus two." Letters joined by hyphens are fine; the moment a digit touches a hyphen it becomes arithmetic. Spell digits as words with ellipses in any read-back rule ("... four... two") and keep hyphens for letters only. Found 2026-09-22 on a real call after three failed email read-backs.
+
+## Nothing hangs up unless the prompt says so
+
+The `endCall` tool being present does not mean the agent uses it. After "bye" the agent waited, and `messagePlan.idleMessages` fired thirteen seconds later on a caller who was already hanging up. Put an explicit rule in the prompt: goodbye or "all set" → one short goodbye and `endCall` in the same turn.

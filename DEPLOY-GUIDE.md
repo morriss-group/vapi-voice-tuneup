@@ -1,5 +1,11 @@
 # Step-by-step: zero to answering your business line
 
+## Before you start — get the files onto your machine
+The steps below run scripts from this repository, so you need a copy of it. Two ways:
+- **Download:** the green **Code** button on the repo page → **Download ZIP** → unzip it. Simple, but a ZIP never changes; when a fix is published here you will not have it until you download again.
+- **Clone:** `git clone https://github.com/morriss-group/vapi-voice-tuneup.git`. Later, `git pull` inside that folder brings in every fix.
+Either way, click **Watch → Custom → Releases** on the repo page so GitHub emails you when something changes, and read [CHANGELOG.md](CHANGELOG.md) for the exact line to edit in your own prompt. Nothing updates on its own.
+
 ## Layer 1+2 — assistant and phone (30-60 min)
 1. Create a VAPI account (vapi.ai) → Assistants → Create.
 2. Model: Anthropic claude-sonnet class, temperature ~0.25, maxTokens 800.

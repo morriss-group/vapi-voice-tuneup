@@ -1,6 +1,6 @@
 # Changelog — what changed, when, and what to change in yours
 
-Newest first. **GitHub does not tell you when a repo you copied from changes.** If you built a voice agent from these instructions, the only ways you will hear about a fix are: (1) on the repo page, click **Watch → Custom → Releases**; each entry below is also published as a Release, and GitHub emails release subscribers; (2) come back and read this file; (3) if you cloned the repo with git, `git pull`. Nothing else notifies you.
+Newest first. **GitHub does not tell you when a repo you copied from changes.** Most readers of the guide opened this page and copied settings by hand, or downloaded a ZIP; neither of those ever updates. The only ways you will hear about a fix are: (1) on the repo page, click **Watch → Custom → Releases**; each entry below is also published as a Release, and GitHub emails release subscribers; (2) come back and read this file; (3) if you cloned the repo with git, `git pull`. Nothing else notifies you.
 
 Each entry says what changed and, in bold, what to edit in your own prompt or settings.
 

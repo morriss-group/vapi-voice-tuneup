@@ -1,5 +1,7 @@
 # Start here — for business owners, not programmers
 
+**Never used GitHub, or not sure what "open source" means for you?** Read [How this works, and what to click](https://morriss-group.github.io/ai-for-appliance-repair/how-this-works) first: what this site is, what a repository is, why nothing updates by itself, and the exact taps on a phone to get an email when a fix is posted.
+
 If you landed here because someone said "an AI can answer your phone and
 book jobs," and the rest of this site looked like a foreign language —
 this page is for you. No jargon. Read it in five minutes and you'll know

@@ -112,6 +112,7 @@ this so you can find it again. Not required.
 | Wanting to test it properly | [TEST-PROTOCOL.md](TEST-PROTOCOL.md) |
 | Wanting every call reported to your inbox | [MAKE-WEBHOOK-WALKTHROUGH.md](MAKE-WEBHOOK-WALKTHROUGH.md) — reports, not booking |
 | Built yours already and wondering what changed | [CHANGELOG.md](CHANGELOG.md) |
+| Wanting to send a fix back | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Handing this to your tech person | Give them the whole link — start with README |
 
 Built by Marc Morriss, Steel City Appliance Repair, Homewood (Birmingham), Alabama —

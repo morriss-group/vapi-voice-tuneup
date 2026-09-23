@@ -69,6 +69,9 @@ Not a programmer? [MAKE-WEBHOOK-WALKTHROUGH.md](MAKE-WEBHOOK-WALKTHROUGH.md) is 
    verified is a webhook firing into the void.
 
 ## Layer 4 — the tools server (when you're ready for real booking)
+
+**What the server in this repository is:** a stand-in that answers every availability question with made-up openings, so you can prove the wiring end to end. It calls no calendar, retries nothing, and will cheerfully "book" the same slot twice. The real one, the part that talks to your scheduling software, is your build; keep it private.
+
 Deploy `tools-server/` from this repo to Railway (or any Node host):
 1. Push it to a GitHub repo → Railway → New Project → Deploy from repo.
 2. CRITICAL, learned the hard way: the included railway.json runs

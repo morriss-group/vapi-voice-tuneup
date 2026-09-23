@@ -79,6 +79,8 @@ const created = await api("/assistant", {
     firstMessage: `Hi — thanks for calling ${biz}. This call is recorded. I'm the AI receptionist — how can I help you today?`,
     model: { provider: "anthropic", model: "claude-sonnet-4-6", temperature: 0.25, maxTokens: 800,
       messages: [{ role: "system", content: prompt }] },
+    // Stock ElevenLabs voice ("Rachel", a public catalog id, not a secret). Every install from this
+    // wizard starts with the same voice; pick your own in the VAPI dashboard afterward.
     voice: { provider: "11labs", voiceId: "21m00Tcm4TlvDq8ikWAM", model: "eleven_turbo_v2_5",
       stability: 0.4, style: 0.3, speed: 1.1, optimizeStreamingLatency: 3 },
     transcriber: { provider: "deepgram", model: "nova-3", numerals: true, keyterm: keyterms },

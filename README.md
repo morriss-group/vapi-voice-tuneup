@@ -24,7 +24,7 @@ you should build it yourself or hand it to someone.
 A fresh VAPI assistant ships with defaults that produce:
 - **Multi-second pauses** before responses (callers say "hello? are you
   there?"). On our own line, measured across 248 real calls after the
-  fixes below, the median wait was still **2.8 s** (p90 4.6 s); see
+  fixes below, the median wait was still **2.8 s** (p90 4.6 s) over 248 calls ending September 2, 2026, and **3.0 s** for ordinary replies (4.0 s on calendar lookups) over 355 turns the week of September 15–22; see
   [`latency/RESULTS.md`](latency/RESULTS.md). We could not measure the
   "before" — the API's history starts after the tune-up — so we don't
   quote one. The biggest single dial we found afterward is the

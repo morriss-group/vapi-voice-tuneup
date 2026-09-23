@@ -2,7 +2,7 @@
 
 Newest first. **GitHub does not tell you when a repo you copied from changes.** Most readers of the guide opened this page and copied settings by hand, or downloaded a ZIP; neither of those ever updates. The only ways you will hear about a fix are: (1) on the repo page, click **Watch → Custom → Releases**; each entry below is also published as a Release, and GitHub emails release subscribers; (2) come back and read this file; (3) if you cloned the repo with git, `git pull`. Nothing else notifies you.
 
-Each entry says what changed and, in bold, what to edit in your own prompt or settings.
+Each entry says what changed and, in bold, what to edit in your own prompt or settings. A GitHub Release (the thing Watch → Custom → Releases emails you about) is cut only when a change alters a live assistant; this page is the complete record, so a dated entry here does not always have a release behind it.
 
 ## 2026-09-23, later the same morning — a correction of our own
 - **Test fixtures replaced and history rewritten.** Two fixtures added at 6:05 AM CT did not meet SECURITY.md's rule; the tip was fixed at 7:22 AM and the morning's four commits were rewritten at 7:28 AM, tag moved with them. If you pulled in that window, re-clone. Caught by an outside read, not by us.

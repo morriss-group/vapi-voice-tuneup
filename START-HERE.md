@@ -40,6 +40,15 @@ voicemail, and a good chunk of them just call the next guy.
 
 ## What it costs — honestly
 
+**It is not one subscription. These are the meters,** and their prices change, so this page names them and sends you to each one's pricing page instead of quoting a number that will be wrong by the time you read it:
+
+- **The voice service (VAPI):** billed per minute of call; by default that minute includes the model and the voice, so you do not need separate model or voice accounts to start.
+- **The phone number (Twilio):** a small monthly charge for the number plus per-minute call charges.
+- **Hosting for the tools server (Railway or similar):** a few dollars a month for the small program in `tools-server/`. Only needed once you want the agent to look at a calendar.
+- **Your scheduling software's plan that allows API access,** if you want it booking onto your real calendar. Some vendors put that behind their higher tier; check yours before you plan on it.
+- **A chat subscription (Claude or similar)** if you also follow the guide's chapters on setting the shop's memory up. Not needed for the phone agent alone.
+
+
 Nobody writes this part down, so here it is. There are three meters
 running, and all of them bill by the minute or the month:
 
@@ -114,6 +123,8 @@ this so you can find it again. Not required.
 | Wondering how it fits together | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Actually deploying | [DEPLOY-GUIDE.md](DEPLOY-GUIDE.md) |
 | Wanting to test it properly | [TEST-PROTOCOL.md](TEST-PROTOCOL.md) |
+| Wanting every call reported to your inbox | [MAKE-WEBHOOK-WALKTHROUGH.md](MAKE-WEBHOOK-WALKTHROUGH.md) — reports, not booking |
+| Built yours already and wondering what changed | [CHANGELOG.md](CHANGELOG.md) |
 | Handing this to your tech person | Give them the whole link — start with README |
 
 Built by Marc Morriss, Steel City Appliance Repair, Birmingham AL —

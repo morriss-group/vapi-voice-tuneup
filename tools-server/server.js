@@ -67,8 +67,10 @@ function requireSecret(req, res, next) {
 
 // Health check (Railway + your own monitoring). Deliberately NOT behind the
 // secret: your host has to be able to reach it to know the app is alive. It
-// returns nothing but ok:true, so there is nothing here to protect.
-app.get("/status", (_req, res) => res.json({ ok: true }));
+// returns ok:true and whether a shared secret is configured (never the value), so a deploy that dropped the variable is visible from outside.
+app.get("/status", (_req, res) =>
+  res.json({ ok: true, secretConfigured: Boolean(process.env.SHARED_SECRET) })
+);
 
 // Example tool endpoint. In VAPI, create a tool whose server URL is
 // https://<your-app>.up.railway.app/vapi and route on the tool name.
@@ -90,8 +92,20 @@ app.post("/vapi", requireSecret, async (req, res) => {
   res.json({ results: [{ toolCallId: call?.id, result: JSON.stringify(result) }] });
 });
 
+// Every value the model types into a field that a downstream system validates gets
+// normalized in code first. Found 2026-09-21: a read-back leaked a space into an
+// email address, the CRM rejected it, and the whole booking died on the email.
+// Strip whitespace, fold spoken "at" / "dot", lowercase, validate; return null if
+// it still is not an address, and let the caller book without one rather than fail.
+export function normalizeEmail(input) {
+  let e = String(input || "").trim().toLowerCase();
+  if (!e) return null;
+  e = e.replace(/\s+at\s+/g, "@").replace(/\s+dot\s+/g, ".").replace(/\s+/g, "");
+  return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(e) ? e : null;
+}
+
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => console.log(`tools server on :${port}`));
+const server = process.env.NODE_TEST ? null : app.listen(port, () => console.log(`tools server on :${port}`));
 
 // Graceful shutdown — with node as PID 1 (see railway.json) this actually
 // runs, and redeploys exit clean instead of registering as crashes.

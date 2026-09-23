@@ -1,5 +1,14 @@
 # Step-by-step: zero to answering your business line
 
+## Before you start — a phone cannot finish this
+
+Everything below needs a computer. A phone can read this page, download a ZIP, and click Watch, and that is where a phone stops. If you have never used a terminal:
+
+- **Install Node.** Go to nodejs.org and install the LTS version with the normal installer. Nothing else.
+- **Open a terminal.** Mac: press Command-Space, type Terminal, press Return. Windows: press the Windows key, type PowerShell, press Return. Every command in this guide is typed into that window and run with Return.
+- **Check it worked.** Type `node -v` and press Return. You should see a version number starting with 20 or higher. If you see "command not found," Node did not install; close the terminal, run the installer again, open a new terminal.
+- **The commands below that start with `node`, `./`, `curl`, or `git` are all typed into that same window,** from inside the folder you unzip or clone in the next section (`cd` followed by the folder's path gets you there; on a Mac you can type `cd ` and drag the folder into the window).
+
 ## Before you start — get the files onto your machine
 The steps below run scripts from this repository, so you need a copy of it. Two ways:
 - **Download:** the green **Code** button on the repo page → **Download ZIP** → unzip it. Simple, but a ZIP never changes; when a fix is published here you will not have it until you download again.
@@ -102,18 +111,19 @@ nothing is at stake — which is exactly why it is easy to skip and easy to forg
    ```
 
    That must print **401**. If it prints 200 you are running a build without
-   the gate. `/status` answers `{"ok":true}` either way — it is a health check
-   and deliberately tells you nothing about your config. To confirm the secret
-   is actually set, check your host's Variables tab. Then call your own agent
-   and confirm a real tool call still succeeds.
+   the gate. `GET /status` answers `{"ok":true,"secretConfigured":true}` when
+   the variable is set and `false` when it is not — it never prints the value.
+   Then call your own agent and confirm a real tool call still succeeds.
 
 5. Do not attach the example `check_availability` tool to an assistant that
    answers a live number. It returns invented windows ("Tue 10-12"), and the
    agent will read them to a caller as if they were on your calendar. Layer 5
    replaces it with a real lookup first.
 
-5. `GET /status` reports `secretConfigured: true/false` so you can check a deploy
-   picked the variable up without ever printing the value.
+6. `GET /status` reports `secretConfigured: true/false` so you can check a deploy
+   picked the variable up without ever printing the value. (Until September 23,
+   2026 this guide said in one place that `/status` told you nothing and in
+   another that it reported this field. The code now does what this line says.)
 
 **The trap this avoids, and it is the one that catches people:** the obvious way
 to write that check treats "no secret configured" as "nothing to check" and lets

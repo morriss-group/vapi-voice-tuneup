@@ -1,5 +1,10 @@
 {
   "name": "vapi-tools-server",
   "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "NODE_TEST=1 node --test test/"
+  },
   "dependencies": { "express": "^4.19.0" }
 }

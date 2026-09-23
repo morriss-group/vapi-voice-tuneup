@@ -110,8 +110,10 @@ drop every keyterm — and you won't find out until a caller says a town
 name and the agent hears something else. That exact thing happened on our
 line: one tuning pass on the transcriber wiped 30+ keyterms; city names
 that had worked for weeks stopped landing, and nobody connected it to the
-change for days. Always GET the live assistant, mutate, and send the
-complete object back. `apply-base.mjs` does this correctly.
+change for days. Always GET the live assistant first, merge your change
+onto the live copy of that object, and send the whole object for that key.
+`apply-base.mjs` does exactly that for `transcriber`, `startSpeakingPlan`,
+`stopSpeakingPlan`, and `voicemailDetection`, and never touches `model`.
 
 **Snapshot before AND after every change.**
 `VAPI_API_KEY=... ./snapshot-assistant.sh <assistant-id>` saves the full

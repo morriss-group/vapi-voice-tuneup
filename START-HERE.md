@@ -15,7 +15,9 @@ You get a **phone number that answers itself.** A caller says their washer
 is leaking. The AI asks what's wrong, gets their address, checks whether
 you cover that area, looks at your real calendar, offers actual open
 windows, and books the appointment. You find out when it lands on your
-schedule.
+schedule. (The calendar part needs your scheduling software connected,
+DEPLOY-GUIDE Layer 4. The small server in this repository is a stand-in
+that answers with made-up openings, so nothing books until you do that.)
 
 It talks. It's not a phone tree. Nobody presses 1 for service.
 
@@ -104,7 +106,7 @@ this so you can find it again. Not required.
 
 | You are… | Read |
 |---|---|
-| Ready to build | [README.md](README.md) — the five fixes, in order of impact |
+| Ready to build | [README.md](README.md) — the fixes, in order of impact |
 | Wondering how it fits together | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Actually deploying | [DEPLOY-GUIDE.md](DEPLOY-GUIDE.md) |
 | Wanting to test it properly | [TEST-PROTOCOL.md](TEST-PROTOCOL.md) |

@@ -6,7 +6,7 @@ Five layers. Each is simple; the wiring is what nobody documents.
   CALLER
     │ dials your business number
     ▼
-  [1] PHONE NUMBER  (Twilio via VAPI, or VAPI-native)
+  [1] PHONE NUMBER  (Twilio, imported into VAPI; not a VAPI-native number if a call will ever be transferred to a person)
     │ routes the call
     ▼
   [2] VAPI ASSISTANT  (the brain: model + voice + transcriber + prompt)

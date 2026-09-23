@@ -113,17 +113,12 @@ nothing is at stake — which is exactly why it is easy to skip and easy to forg
    That must print **401**. If it prints 200 you are running a build without
    the gate. `GET /status` answers `{"ok":true,"secretConfigured":true}` when
    the variable is set and `false` when it is not — it never prints the value.
-   Then call your own agent and confirm a real tool call still succeeds.
+   Then call your own agent and confirm a real tool call still succeeds. (Until September 23, 2026 this guide said in one place that `/status` told you nothing about your config; the code now returns this field, and it never prints the value.)
 
 5. Do not attach the example `check_availability` tool to an assistant that
    answers a live number. It returns invented windows ("Tue 10-12"), and the
    agent will read them to a caller as if they were on your calendar. Layer 5
    replaces it with a real lookup first.
-
-6. `GET /status` reports `secretConfigured: true/false` so you can check a deploy
-   picked the variable up without ever printing the value. (Until September 23,
-   2026 this guide said in one place that `/status` told you nothing and in
-   another that it reported this field. The code now does what this line says.)
 
 **The trap this avoids, and it is the one that catches people:** the obvious way
 to write that check treats "no secret configured" as "nothing to check" and lets

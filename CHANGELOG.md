@@ -4,6 +4,12 @@ Newest first. **GitHub does not tell you when a repo you copied from changes.** 
 
 Each entry says what changed and, in bold, what to edit in your own prompt or settings.
 
+## 2026-09-23, later the same morning — a correction of our own
+- **Test fixtures replaced and history rewritten.** Two fixtures added at 6:05 AM CT did not meet SECURITY.md's rule; the tip was fixed at 7:22 AM and the morning's four commits were rewritten at 7:28 AM, tag moved with them. If you pulled in that window, re-clone. Caught by an outside read, not by us.
+- **`.env.example` is really in the repository now.** The morning entry below said it was added; `.gitignore` had swallowed it, so it never reached GitHub. Fixed with an exception.
+- **One cost list.** START-HERE carried two lists that disagreed with each other (five meters, then "three meters"); merged into one.
+- **`/status` explained once** in DEPLOY-GUIDE instead of twice.
+
 ## 2026-09-23 — corrections from an outside review, and the first test
 An independent reviewer tried to build from this repository as a first-timer and then read it as a thirty-year engineer would. Everything below came from that.
 - **Deploy guide:** a new first section says a phone cannot finish the deploy, how to install Node, how to open a terminal, and where every command is typed. The two contradictory statements about `/status` are gone; the code now returns `secretConfigured: true/false` (never the value).

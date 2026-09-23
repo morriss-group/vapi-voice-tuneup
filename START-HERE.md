@@ -49,24 +49,9 @@ voicemail, and a good chunk of them just call the next guy.
 - **A chat subscription (Claude or similar)** if you also follow the guide's chapters on setting the shop's memory up. Not needed for the phone agent alone.
 
 
-Nobody writes this part down, so here it is. There are three meters
-running, and all of them bill by the minute or the month:
+One warning that belongs with the phone number: **not a VAPI-provided number if your agent will ever transfer a caller to a person.** Those cannot do it, and the failure is silent to the caller and cryptic to you; README fix #9 has the test that showed it. The voice itself (ElevenLabs, Cartesia) is bundled into the VAPI minute unless you pick a voice vendor it does not bundle.
 
-1. **The voice platform** (VAPI or similar) — charged per minute of call
-2. **The phone number and carrier** (get it from Twilio and import it) — a
-   small monthly fee for the number, plus per-minute. **Not a Vapi-provided
-   number if your agent will ever transfer a caller to a person: those cannot
-   do it, and the failure is silent to the caller and cryptic to you. README
-   fix #9 has the test that showed it.**
-3. **The voice itself** (ElevenLabs, Cartesia) — often bundled, sometimes
-   separate
-
-In practice it lands in the **pennies-per-minute** range, so a shop taking
-a normal volume of calls is looking at a modest monthly bill — but check
-each provider's current pricing page yourself before you commit, because
-these change. **The comparison that matters:** a human answering service
-typically costs far more per month, doesn't know your brands, and can't
-book onto your calendar.
+In practice the calls themselves land in the pennies-per-minute range, so a shop taking a normal volume of calls is looking at a modest monthly bill. Check each provider's current pricing page before you commit; these change. The comparison that matters: a human answering service typically costs far more per month, doesn't know your brands, and can't book onto your calendar.
 
 Add whatever it costs you in time to set up. Which brings us to:
 
@@ -127,5 +112,5 @@ this so you can find it again. Not required.
 | Built yours already and wondering what changed | [CHANGELOG.md](CHANGELOG.md) |
 | Handing this to your tech person | Give them the whole link — start with README |
 
-Built by Marc Morriss, Steel City Appliance Repair, Birmingham AL —
+Built by Marc Morriss, Steel City Appliance Repair, Homewood (Birmingham), Alabama —
 30 years fixing appliances, and the last year teaching a phone to book them.

@@ -7,3 +7,5 @@ config-snapshots/
 calls.json
 **/calls.json
 .DS_Store
+# Names only; meant to be tracked.
+!tools-server/.env.example

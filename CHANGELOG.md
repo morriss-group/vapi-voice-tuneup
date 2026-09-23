@@ -11,7 +11,7 @@ An independent reviewer tried to build from this repository as a first-timer and
 - **README:** the description of what `apply-base.mjs` does now matches the script.
 - **START-HERE:** the meters that bill you are listed by name; the next-step table gained the webhook walkthrough and this changelog.
 - **The guide (separate repository):** every GitHub address is now a link; chapter 2 says where a phone stops and that the webhook walkthrough is reports, not booking.
-- **History note:** commit `0658ed8` on September 3, 2026 removed a latency file that held the shop's own identifiers (assistant and number IDs, no customer data, no credentials). The old file remains in git history on purpose; rewriting history would break the release tags people watch.
+- **History note:** commit `0658ed8` on September 3, 2026 removed a latency study that named the shop and held two weeks of its call statistics (no caller data, no credentials); a sanitized version came back later as `latency/RESULTS.md`. The old file remains in git history on purpose; rewriting history would break the release tags people watch.
 
 ## 2026-09-22, evening — v4b: five prompt rules, and an end-call tool on the Retell backup
 Found by reading one booking call that had gone fine. Detail: [TUNING-LOG-2026-09-22.md](TUNING-LOG-2026-09-22.md), "Later the same day."

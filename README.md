@@ -100,6 +100,21 @@ Deliberation off the phone, scripts on it.
   removes the question permanently.
 - **One filler per tool call.** If the tool has a request-start message,
   tell the model not to add its own; otherwise callers hear both.
+- **Stored data is spelled the way it is stored, not the way it is said.** Our
+  lookup tool handed the model a street address exactly as the CRM saved it, and
+  the voice read the abbreviation "Dr" as "Doctor." The caller had to correct it.
+  No prompt rule fixes this reliably, because the model reads what it is given.
+  Expand abbreviations (Dr, St, Ave, N, Apt) in the tool's response before the
+  model sees them, and leave the stored record alone so bookings still match.
+- **`endCallMessage` doubles the goodbye.** The model says its own goodbye, then
+  the platform plays yours. Without it the model tends to end on a bare
+  "Goodbye." Pick one: either set `endCallMessage` and tell the prompt not to
+  say goodbye, or leave it unset and write the closing line into the prompt.
+- **Outbound calls get answered by call screeners.** A caller-ID screening app
+  will pick up, ask who is calling and why, and only then ring the person. An
+  agent that launches into its script at the first "hello" has just given it to
+  a robot. For outbound, the prompt needs one line: state your name and reason
+  when asked, then wait for the person.
 
 ### 5. The API trap that will bite you
 **PATCH replaces the ENTIRE object you send — `model` AND `transcriber`.**

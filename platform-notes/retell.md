@@ -32,6 +32,15 @@ Per this kit's rule: nothing here is speculation.
   `has_more`) instead of a bare array. Nothing in the failover path calls it — the one flagged
   call (2026-08-31) was a hand check from a session verifying the number→agent binding. Same
   pattern as the agent-list retirement above: the legacy list endpoints all moved to `/v2/`.
+- **LLM listing and call listing moved too (Retell notice received 2026-09-28).** `GET /list-retell-llms`
+  is retired; use `GET /v2/list-retell-llms`. `POST /v2/list-calls` is retired; use `POST /v3/list-calls`
+  (there is no v2 of list-calls any more). Both return the paginated object (`items`, `pagination_key`,
+  `has_more`), never a bare array. The v3 call list leaves out `transcript`, `transcript_object`,
+  `transcript_with_tool_calls` and `recording_url` to stay small; fetch those per call with
+  `GET /v1/get-call/{call_id}`. Verified 2026-09-28: both replacements answer 200 with `items`. The two
+  flagged legacy calls were a hand check from a session deploying a prompt to the backup line on 9/22;
+  nothing scheduled in the failover path lists LLMs or calls. Retell sends this notice every Monday
+  while legacy calls continue, and counts the last 7 days, so one stray hand check earns a letter.
 
 - **Agent listing moved too.** `GET /list-agents` and `GET /list-chat-agents`
   were retired 07/31/2026 in favor of `POST /v2/list-agents`: POST not GET,

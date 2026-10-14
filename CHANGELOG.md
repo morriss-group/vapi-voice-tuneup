@@ -4,6 +4,13 @@ Newest first. **GitHub does not tell you when a repo you copied from changes.** 
 
 Each entry says what changed and, in bold, what to edit in your own prompt or settings. A GitHub Release (the thing Watch → Custom → Releases emails you about) is cut only when a change alters a live assistant; this page is the complete record, so a dated entry here does not always have a release behind it.
 
+## 2026-10-14: a tool reply promised a day it had never looked at
+A caller was offered the first opening, six days out, and asked for today. The availability tool's same-day reply was a fixed sentence: "Same-day appointments cannot be booked over the phone, the earliest I can offer is tomorrow." It never checked tomorrow. Tomorrow was full. The agent checked, said "Thursday is fully booked," had nothing else to offer, and the caller hung up without booking. The agent did exactly what the prompt told it to do, which is say the tool's words. The tool's words were wrong.
+- **Search your tools server for any reply that turns a day down** (same-day, weekend, day off, fully booked) and make it look up the next open day and name it in the same reply, with its windows. Never let a fixed sentence name a day the code has not checked.
+- **Search for "tomorrow"** in your tool replies. Ours had it in two places: the availability reply and the booking tool's same-day refusal.
+- **If your prompt quotes a tool's sentence as an example, update the example when the tool changes.** Ours still quoted the old sentence after the fix; a live text test showed the agent repeating the tool's new words, not the old example, but the example goes at the next prompt change. The 2026-09-22 tuning log quoted it too and now carries a correction.
+- **The skeleton:** the `check_availability` stub in `tools-server/server.js` now carries this rule as a comment where you will wire your calendar. No code changed.
+
 ## 2026-09-23, later the same morning — a correction of our own
 - **Test fixtures replaced and history rewritten.** Two fixtures added at 6:05 AM CT did not meet SECURITY.md's rule; the tip was fixed at 7:22 AM and the morning's four commits were rewritten at 7:28 AM, tag moved with them. If you pulled in that window, re-clone. Caught by an outside read, not by us.
 - **`.env.example` is really in the repository now.** The morning entry below said it was added; `.gitignore` had swallowed it, so it never reached GitHub. Fixed with an exception.

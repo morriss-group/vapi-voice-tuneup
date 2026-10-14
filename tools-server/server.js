@@ -84,6 +84,13 @@ app.post("/vapi", requireSecret, async (req, res) => {
       // STUB. These are not real openings. Do not attach this tool to an
       // assistant that answers a live number until it reads a real calendar —
       // the agent will read these windows out loud as if they were bookable.
+      //
+      // When you wire it to your calendar, one rule from a live call (2026-10-14):
+      // a reply that turns a day down (same-day, a weekend, a day off, a full day)
+      // names the next day your calendar actually shows open, in that same reply.
+      // Never name a day the code has not looked at. Our reply said "the earliest
+      // I can offer is tomorrow" without checking; tomorrow was full, the agent
+      // checked, said so, had nothing else to offer, and the caller hung up.
       result = { available: true, next_slots: ["Tue 10-12", "Wed 2-4"] };
       break;
     default:

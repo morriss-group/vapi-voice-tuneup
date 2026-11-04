@@ -81,7 +81,8 @@ app.get("/status", (_req, res) =>
 // several calls, and VAPI expects one result per call id, in one reply.
 app.post("/vapi", requireSecret, async (req, res) => {
   const msg = req.body?.message || {};
-  const calls = msg.toolCallList || msg.toolCalls || [];
+  // An empty list is truthy, so take the first list that has calls in it.
+  const calls = [msg.toolCallList, msg.toolCalls].find((l) => Array.isArray(l) && l.length) || [];
   const results = [];
   for (const call of calls) {
     const name = call?.name || call?.function?.name;

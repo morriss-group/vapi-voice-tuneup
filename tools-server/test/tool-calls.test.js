@@ -53,3 +53,8 @@ test("an undeclared tool name gets an error result, not silence", async () => {
   assert.equal(body.results[0].toolCallId, "call-d");
   assert.match(body.results[0].result, /unknown tool: no_such_tool/);
 });
+
+test("an empty toolCallList does not hide the calls in toolCalls", async () => {
+  const body = await postVapi({ type: "tool-calls", toolCallList: [], toolCalls: [call("call-e", "check_availability", {})] });
+  assert.deepEqual(body.results.map((r) => r.toolCallId), ["call-e"]);
+});

@@ -4,6 +4,11 @@ Newest first. **GitHub does not tell you when a repo you copied from changes.** 
 
 Each entry says what changed and, in bold, what to edit in your own prompt or settings. A GitHub Release (the thing Watch → Custom → Releases emails you about) is cut only when a change alters a live assistant; this page is the complete record, so a dated entry here does not always have a release behind it.
 
+## 2026-11-04: the tools server read the wrong list and answered only the first call
+Found in an outside code review (issue #3), not on a live call. `/vapi` read `message.toolCalls` and answered only its first entry. VAPI's server events page documents the list as `message.toolCallList`, and one request can carry several calls, each expecting its own result. If VAPI ever stops sending the extra field, every tool answers "unknown tool: undefined"; a second call in one request got no answer at all.
+- **If you copied the skeleton,** read `message.toolCallList` first and `message.toolCalls` only as a fallback, loop over every call, and return one `{ toolCallId, result }` per call id in a single `results` array.
+- **The skeleton:** `tools-server/server.js` now does that, and `test/tool-calls.test.js` posts VAPI's documented request, including one with two calls.
+
 ## 2026-10-14: a tool reply promised a day it had never looked at
 A caller was offered the first opening, six days out, and asked for today. The availability tool's same-day reply was a fixed sentence: "Same-day appointments cannot be booked over the phone, the earliest I can offer is tomorrow." It never checked tomorrow. Tomorrow was full. The agent checked, said "Thursday is fully booked," had nothing else to offer, and the caller hung up without booking. The agent did exactly what the prompt told it to do, which is say the tool's words. The tool's words were wrong.
 - **Search your tools server for any reply that turns a day down** (same-day, weekend, day off, fully booked) and make it look up the next open day and name it in the same reply, with its windows. Never let a fixed sentence name a day the code has not checked.

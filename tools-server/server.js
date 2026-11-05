@@ -3,7 +3,7 @@
 // where the AI's requests meet your real business systems.
 import express from "express";
 import crypto from "node:crypto";
-const app = express();
+export const app = express();
 app.use(express.json({ limit: "256kb" }));
 
 // ---------------------------------------------------------------------------
@@ -74,10 +74,46 @@ app.get("/status", (_req, res) =>
 
 // Example tool endpoint. In VAPI, create a tool whose server URL is
 // https://<your-app>.up.railway.app/vapi and route on the tool name.
+//
+// VAPI's documented tool-calls message carries the list as
+// message.toolCallList (docs.vapi.ai/server-url/events); some requests also
+// carry message.toolCalls, so read that as a fallback. One request can hold
+// several calls, and VAPI expects one result per call id, in one reply.
 app.post("/vapi", requireSecret, async (req, res) => {
-  const call = req.body?.message?.toolCalls?.[0];
-  const name = call?.function?.name;
-  const args = call?.function?.arguments || {};
+  const msg = req.body?.message || {};
+  // An empty list is truthy, so take the first list that has calls in it.
+  const calls = [msg.toolCallList, msg.toolCalls].find((l) => Array.isArray(l) && l.length) || [];
+  const results = [];
+  for (const call of calls) {
+    const name = call?.name || call?.function?.name;
+    let args = call?.arguments || call?.function?.arguments || {};
+    if (typeof args === "string") {
+      try { args = JSON.parse(args); } catch { args = {}; }
+    }
+    // VAPI wants one entry per call id with either `result` or `error`, each a flat string, and
+    // speaks its Request Failed message only when it sees `error` (docs.vapi.ai/tools/custom-tools).
+    // A tool that throws, or returns something that cannot be turned into a string, answers its own
+    // call with `error`, so the other calls in the request still get theirs.
+    const entry = { name, toolCallId: call?.id || call?.toolCallId };
+    try {
+      const out = await tools.run(name, args);
+      if (out && typeof out === "object" && typeof out.error === "string") entry.error = out.error;
+      else entry.result = JSON.stringify(out ?? null);
+    } catch (e) {
+      // The error's type only: a real client's message can carry a URL with a key or a customer's email.
+      console.error(`tool ${String(name).replace(/[^\w.-]/g, "?").slice(0, 64)} failed (${e?.name || "Error"})`);
+      entry.error = `tool failed: ${name}`;
+    }
+    results.push(entry);
+  }
+  res.json({ results });
+});
+
+// The handler calls tools.run, not runTool directly, so a test can swap in a tool that throws.
+export const tools = { run: runTool };
+
+// Route on the tool name. args is the parsed object the model filled in.
+function runTool(name, args) {
   let result;
   switch (name) {
     case "check_availability":
@@ -96,8 +132,8 @@ app.post("/vapi", requireSecret, async (req, res) => {
     default:
       result = { error: `unknown tool: ${name}` };
   }
-  res.json({ results: [{ toolCallId: call?.id, result: JSON.stringify(result) }] });
-});
+  return result;
+}
 
 // Every value the model types into a field that a downstream system validates gets
 // normalized in code first. Found 2026-09-21: a read-back leaked a space into an
@@ -110,6 +146,12 @@ export function normalizeEmail(input) {
   e = e.replace(/\s+at\s+/g, "@").replace(/\s+dot\s+/g, ".").replace(/\s+/g, "");
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(e) ? e : null;
 }
+
+// A body that is not JSON fails in express.json(), before the secret check. Answer it with a
+// plain 400 and nothing else; Express's own error page shows a stack with the server's paths.
+app.use((err, _req, res, _next) => {
+  res.status(err?.status >= 400 && err.status < 500 ? err.status : 500).json({ error: "bad request" });
+});
 
 const port = process.env.PORT || 3000;
 const server = process.env.NODE_TEST ? null : app.listen(port, () => console.log(`tools server on :${port}`));

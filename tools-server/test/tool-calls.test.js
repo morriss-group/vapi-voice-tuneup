@@ -51,7 +51,8 @@ test("still reads toolCalls when toolCallList is absent", async () => {
 test("an undeclared tool name gets an error result, not silence", async () => {
   const body = await postVapi({ type: "tool-calls", toolCallList: [call("call-d", "no_such_tool", {})] });
   assert.equal(body.results[0].toolCallId, "call-d");
-  assert.match(body.results[0].result, /unknown tool: no_such_tool/);
+  assert.equal(body.results[0].error, "unknown tool: no_such_tool");
+  assert.equal(body.results[0].result, undefined, "error or result, never both");
 });
 
 test("an empty toolCallList does not hide the calls in toolCalls", async () => {
@@ -68,9 +69,52 @@ test("a tool that throws gets an error result, and the other calls in the reques
   try {
     const body = await postVapi({ type: "tool-calls", toolCallList: [call("call-f", "check_availability", {}), call("call-g", "no_such_tool", {})] });
     assert.deepEqual(body.results.map((r) => r.toolCallId), ["call-f", "call-g"]);
-    assert.match(body.results[0].result, /tool failed: check_availability/);
-    assert.match(body.results[1].result, /unknown tool: no_such_tool/);
+    assert.equal(body.results[0].error, "tool failed: check_availability");
+    assert.equal(body.results[1].error, "unknown tool: no_such_tool");
   } finally {
     tools.run = real;
   }
+});
+
+test("VAPI's documented example request, verbatim but for the call object, gets one entry for abc123", async () => {
+  // docs.vapi.ai/server-url/events, opened 2026-11-05. sendEmail is not a tool here, so it gets an error.
+  const body = await postVapi({
+    type: "tool-calls",
+    call: {},
+    toolCallList: [{ id: "abc123", type: "function", function: { name: "sendEmail", arguments: { emailAddress: "john@example.com", message: "Hi!" } } }],
+    toolWithToolCallList: [{
+      type: "function",
+      function: { name: "sendEmail", parameters: {} },
+      toolCall: { id: "abc123", type: "function", function: { name: "sendEmail", arguments: { emailAddress: "john@example.com", message: "Hi!" } } },
+    }],
+  });
+  assert.deepEqual(body.results, [{ name: "sendEmail", toolCallId: "abc123", error: "unknown tool: sendEmail" }]);
+});
+
+test("a result that cannot be turned into a string, or no result at all, still gets a well-formed entry", async () => {
+  const real = tools.run;
+  tools.run = async (name) => {
+    if (name === "circular") { const o = {}; o.self = o; return o; }
+    return undefined;
+  };
+  const lines = [];
+  const saved = console.error;
+  console.error = (...a) => lines.push(a.join(" "));
+  try {
+    const body = await postVapi({ type: "tool-calls", toolCallList: [call("call-h", "circular", {}), call("call-i", "nothing", {})] });
+    assert.deepEqual(body.results, [
+      { name: "circular", toolCallId: "call-h", error: "tool failed: circular" },
+      { name: "nothing", toolCallId: "call-i", result: "null" },
+    ]);
+  } finally {
+    tools.run = real;
+    console.error = saved;
+  }
+  assert.deepEqual(lines, ["tool circular failed (TypeError)"], "the log names the tool and the error type, never the message");
+});
+
+test("a body that is not JSON gets a plain 400 with no stack, before the secret is checked", async () => {
+  const res = await fetch(`${base}/vapi`, { method: "POST", headers: { "content-type": "application/json" }, body: "{not json" });
+  assert.equal(res.status, 400);
+  assert.deepEqual(await res.json(), { error: "bad request" });
 });

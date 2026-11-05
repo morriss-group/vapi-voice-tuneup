@@ -90,16 +90,21 @@ app.post("/vapi", requireSecret, async (req, res) => {
     if (typeof args === "string") {
       try { args = JSON.parse(args); } catch { args = {}; }
     }
-    // A tool that throws (a real calendar or CRM call that fails) answers its own call with an
-    // error result, so the other calls in the request still get theirs and the agent hears a reply.
-    let result;
+    // VAPI wants one entry per call id with either `result` or `error`, each a flat string, and
+    // speaks its Request Failed message only when it sees `error` (docs.vapi.ai/tools/custom-tools).
+    // A tool that throws, or returns something that cannot be turned into a string, answers its own
+    // call with `error`, so the other calls in the request still get theirs.
+    const entry = { name, toolCallId: call?.id || call?.toolCallId };
     try {
-      result = await tools.run(name, args);
+      const out = await tools.run(name, args);
+      if (out && typeof out === "object" && typeof out.error === "string") entry.error = out.error;
+      else entry.result = JSON.stringify(out ?? null);
     } catch (e) {
-      console.error(`tool ${name} failed: ${String(e?.message || e).slice(0, 200)}`);
-      result = { error: `tool failed: ${name}` };
+      // The error's type only: a real client's message can carry a URL with a key or a customer's email.
+      console.error(`tool ${String(name).replace(/[^\w.-]/g, "?").slice(0, 64)} failed (${e?.name || "Error"})`);
+      entry.error = `tool failed: ${name}`;
     }
-    results.push({ name, toolCallId: call?.id || call?.toolCallId, result: JSON.stringify(result) });
+    results.push(entry);
   }
   res.json({ results });
 });
@@ -141,6 +146,12 @@ export function normalizeEmail(input) {
   e = e.replace(/\s+at\s+/g, "@").replace(/\s+dot\s+/g, ".").replace(/\s+/g, "");
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(e) ? e : null;
 }
+
+// A body that is not JSON fails in express.json(), before the secret check. Answer it with a
+// plain 400 and nothing else; Express's own error page shows a stack with the server's paths.
+app.use((err, _req, res, _next) => {
+  res.status(err?.status >= 400 && err.status < 500 ? err.status : 500).json({ error: "bad request" });
+});
 
 const port = process.env.PORT || 3000;
 const server = process.env.NODE_TEST ? null : app.listen(port, () => console.log(`tools server on :${port}`));

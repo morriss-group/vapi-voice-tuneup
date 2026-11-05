@@ -90,10 +90,22 @@ app.post("/vapi", requireSecret, async (req, res) => {
     if (typeof args === "string") {
       try { args = JSON.parse(args); } catch { args = {}; }
     }
-    results.push({ name, toolCallId: call?.id || call?.toolCallId, result: JSON.stringify(runTool(name, args)) });
+    // A tool that throws (a real calendar or CRM call that fails) answers its own call with an
+    // error result, so the other calls in the request still get theirs and the agent hears a reply.
+    let result;
+    try {
+      result = await tools.run(name, args);
+    } catch (e) {
+      console.error(`tool ${name} failed: ${String(e?.message || e).slice(0, 200)}`);
+      result = { error: `tool failed: ${name}` };
+    }
+    results.push({ name, toolCallId: call?.id || call?.toolCallId, result: JSON.stringify(result) });
   }
   res.json({ results });
 });
+
+// The handler calls tools.run, not runTool directly, so a test can swap in a tool that throws.
+export const tools = { run: runTool };
 
 // Route on the tool name. args is the parsed object the model filled in.
 function runTool(name, args) {

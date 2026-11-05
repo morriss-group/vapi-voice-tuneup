@@ -2,7 +2,7 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 process.env.NODE_TEST = "1";
 process.env.SHARED_SECRET = "test-only-secret";
-const { app } = await import("../server.js");
+const { app, tools } = await import("../server.js");
 
 let server, base;
 before(async () => {
@@ -57,4 +57,20 @@ test("an undeclared tool name gets an error result, not silence", async () => {
 test("an empty toolCallList does not hide the calls in toolCalls", async () => {
   const body = await postVapi({ type: "tool-calls", toolCallList: [], toolCalls: [call("call-e", "check_availability", {})] });
   assert.deepEqual(body.results.map((r) => r.toolCallId), ["call-e"]);
+});
+
+test("a tool that throws gets an error result, and the other calls in the request still get theirs", async () => {
+  const real = tools.run;
+  tools.run = async (name, args) => {
+    if (name === "check_availability") throw new Error("calendar down");
+    return real(name, args);
+  };
+  try {
+    const body = await postVapi({ type: "tool-calls", toolCallList: [call("call-f", "check_availability", {}), call("call-g", "no_such_tool", {})] });
+    assert.deepEqual(body.results.map((r) => r.toolCallId), ["call-f", "call-g"]);
+    assert.match(body.results[0].result, /tool failed: check_availability/);
+    assert.match(body.results[1].result, /unknown tool: no_such_tool/);
+  } finally {
+    tools.run = real;
+  }
 });
